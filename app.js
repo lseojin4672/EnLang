@@ -28,6 +28,10 @@ function openDialog(title, ...children) {
   if (!dialog.open) dialog.showModal();
 }
 
+const ordinals = ['첫째', '둘째', '셋째', '넷째', '다섯째', '여섯째'];
+const yardName = number => (ordinals[number - 1] ?? number + '번째') + ' 마당';
+const stepName = index => index === 0 ? '첫걸음' : (ordinals[index] ?? (index + 1) + '번째') + ' 걸음';
+
 function start({ units, adventure = [] }, layout) {
   const allLessons = units.flatMap(unit => unit.lessons);
   let unitIndex = 0;
@@ -43,7 +47,7 @@ function start({ units, adventure = [] }, layout) {
     const lesson = lessons[index];
     const state = Learning.progress(lessons).status(index);
     if (state === 'locked') {
-      openDialog(lesson.title, element('p', '', '‘' + lessons[index - 1].title + '’ 레슨을 먼저 완료해 주세요.'));
+      openDialog(lesson.title, element('p', '', '‘' + lessons[index - 1].title + '’ 걸음을 먼저 완료해 주세요.'));
       return;
     }
     const prompt = element('p', '', lesson.question);
@@ -56,7 +60,7 @@ function start({ units, adventure = [] }, layout) {
         return;
       }
       const earned = Learning.complete(lessons, index);
-      feedback.textContent = earned ? '정답이에요! +' + lesson.xp + ' XP' : '정답이에요!';
+      feedback.textContent = earned ? '정답이에요! 경험치 +' + lesson.xp : '정답이에요!';
       options.forEach(option => { option.disabled = true; });
       check.hidden = true;
       const done = button('완료', 'action', () => dialog.close());
@@ -112,20 +116,20 @@ function start({ units, adventure = [] }, layout) {
     const progress = Learning.progress(allLessons);
     const currentUnit = units.filter((unit, index) => canEnter(index, progress)).at(-1).number;
     const openCount = adventure.filter(region => region.unit <= currentUnit).length;
-    find('adventure-progress').textContent = openCount + ' / ' + adventure.length + ' 구역 해금';
+    find('adventure-progress').textContent = openCount + ' / ' + adventure.length + ' 구역 열림';
     regions.forEach(({ target, lock, mask }, index) => {
       const region = adventure[index];
       const locked = region.unit > currentUnit;
-      target.setAttribute('aria-label', locked ? '유닛 ' + region.unit + ', 잠김' : region.places.join(', ') + ', 탐험 가능');
+      target.setAttribute('aria-label', locked ? yardName(region.unit) + ', 잠김' : region.places.join(', ') + ', 탐험 가능');
       target.setAttribute('aria-pressed', String(index === selectedRegion));
       lock.hidden = !locked;
       mask.style.display = locked ? '' : 'none';
     });
     const region = adventure[selectedRegion];
     const locked = region.unit > currentUnit;
-    find('region-title').textContent = locked ? '유닛 ' + region.unit : region.places.join(', ');
+    find('region-title').textContent = locked ? yardName(region.unit) : region.places.join(', ');
     find('region-description').textContent = locked
-      ? '유닛 ' + region.unit + '에 도달하면 열려요.'
+      ? yardName(region.unit) + '이 열리면 탐험할 수 있어요.'
       : region.description;
     find('region-learn').hidden = !locked;
   }
@@ -145,9 +149,9 @@ function start({ units, adventure = [] }, layout) {
       const meter = element('progress');
       meter.max = unit.lessons.length;
       meter.value = count;
-      meter.setAttribute('aria-label', '유닛 ' + unit.number + ' 진행도');
+      meter.setAttribute('aria-label', yardName(unit.number) + ' 진행도');
       info.append(
-        element('span', 'unit-card-number', '유닛 ' + unit.number),
+        element('span', 'unit-card-number', yardName(unit.number)),
         element('h2', 'unit-card-title', unit.title),
         meter,
         element('small', 'unit-card-count', count + ' / ' + unit.lessons.length + ' 완료')
@@ -157,7 +161,7 @@ function start({ units, adventure = [] }, layout) {
         if (index === unitIndex) card.setAttribute('aria-current', 'page');
         info.append(element('span', 'unit-card-action', count === unit.lessons.length ? '복습하기' : '계속하기'));
       } else {
-        info.append(element('small', 'unit-card-requirement', '유닛 ' + units[index - 1].number + '을 완료하면 열려요.'));
+        info.append(element('small', 'unit-card-requirement', yardName(units[index - 1].number) + '을 완료하면 열려요.'));
         const status = element('span', 'unit-card-action');
         const lock = element('span', 'lock');
         lock.setAttribute('aria-hidden', 'true');
@@ -190,17 +194,17 @@ function start({ units, adventure = [] }, layout) {
     const next = units[unitIndex + 1];
     const nextOpen = Boolean(next && canEnter(unitIndex + 1, total));
     find('learn-logo').href = unitHref(unit);
-    find('unit').textContent = 'UNIT ' + unit.number;
+    find('unit').textContent = yardName(unit.number);
     find('title').textContent = unit.title;
     find('description').textContent = unit.description;
-    find('xp-value').textContent = total.xp + ' XP';
+    find('xp-value').textContent = '경험치 ' + total.xp;
     find('count').textContent = progress.completed.length + ' / ' + lessons.length;
     find('progress').max = lessons.length;
     find('progress').value = progress.completed.length;
     find('next-unit').hidden = !next;
     find('next-lock').hidden = nextOpen;
-    find('next').textContent = next ? '유닛 ' + next.number + ' · ' + next.title : '';
-    find('next-status').textContent = nextOpen ? '다음 유닛이 열렸어요.' : '현재 유닛을 완료하면 열려요.';
+    find('next').textContent = next ? yardName(next.number) + ' · ' + next.title : '';
+    find('next-status').textContent = nextOpen ? '다음 마당이 열렸어요.' : '이 마당의 모든 걸음을 마치면 열려요.';
     const nextLink = find('next-link');
     nextLink.hidden = !nextOpen;
     if (nextOpen) nextLink.href = unitHref(next);
@@ -215,14 +219,14 @@ function start({ units, adventure = [] }, layout) {
         const control = button(undefined, 'lesson', () => showLesson(index));
         const disc = element('span', 'disc');
         disc.setAttribute('aria-hidden', 'true');
-        control.append(disc, element('span', 'lesson-label', lesson.title));
+        control.append(disc, element('span', 'lesson-label', stepName(index) + ' · ' + lesson.title));
         row.append(control);
         path.append(row);
       }
       const sprite = LessonLayout.apply(row, layout, lesson.id, state);
       const control = row.firstElementChild;
       control.dataset.state = state;
-      control.setAttribute('aria-label', lesson.title + ', ' + labels[state]);
+      control.setAttribute('aria-label', stepName(index) + ', ' + lesson.title + ', ' + labels[state]);
       const disc = control.firstElementChild;
       const fallback = state === 'locked'
         ? element('span', 'lock')
@@ -239,8 +243,8 @@ function start({ units, adventure = [] }, layout) {
     renderAdventure();
     find('history-list').replaceChildren(...(total.completed.length
       ? [...total.completed].sort((a, b) => total.date(b.id).localeCompare(total.date(a.id))).map(lesson =>
-        element('div', 'record', lesson.title + ' · +' + lesson.xp + ' XP · ' + dateFormat.format(new Date(total.date(lesson.id)))))
-      : [element('p', '', '아직 완료한 레슨이 없어요.')]));
+        element('div', 'record', lesson.title + ' · 경험치 +' + lesson.xp + ' · ' + dateFormat.format(new Date(total.date(lesson.id)))))
+      : [element('p', '', '아직 완료한 걸음이 없어요.')]));
   }
 
   function renderRoute() {
@@ -255,7 +259,7 @@ function start({ units, adventure = [] }, layout) {
     } else if (requested || hash === '#/units') {
       page = 'units';
       if (requested) {
-        routeMessage = index < 0 ? '해당 유닛을 찾을 수 없어요.' : '앞 유닛을 먼저 완료해 주세요.';
+        routeMessage = index < 0 ? '해당 마당을 찾을 수 없어요.' : '앞 마당을 먼저 마쳐 주세요.';
         history.replaceState(null, '', '#/units');
       }
     } else {

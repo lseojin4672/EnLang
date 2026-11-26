@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="./style.css?v=unit-cards">
 <script defer src="./learning.js"></script>
 <script defer src="./layout.js"></script>
-<script defer src="./app.js?v=unit-cards"></script>
+<script defer src="./app.js?v=korean-terms"></script>
 </head>
 <body>
 <div class="app">
@@ -17,20 +17,20 @@
     <section id="learn" aria-label="학습">
       <header><a class="banner unit-title-link" href="#/units" aria-labelledby="unit title" aria-describedby="description"><span id="unit"></span><h1 id="title"></h1><p id="description"></p></a></header>
       <section class="progress"><div><strong>학습 진행도</strong><span id="count"></span></div><progress id="progress" aria-label="학습 진행도"></progress></section>
-      <ol id="path" class="path" aria-label="레슨 경로"></ol>
+      <ol id="path" class="path" aria-label="배움길"></ol>
       <aside id="next-unit" class="next">
         <span id="next-lock" class="lock" aria-hidden="true"></span>
-        <div><span>다음 유닛</span><strong id="next"></strong><small id="next-status"></small><a id="next-link" class="action unit-link" hidden>다음 유닛으로</a></div>
+        <div><span>다음 마당</span><strong id="next"></strong><small id="next-status"></small><a id="next-link" class="action unit-link" hidden>다음 마당으로</a></div>
       </aside>
     </section>
     <section id="units" aria-labelledby="units-title" hidden>
-      <h1 id="units-title">유닛 모음</h1>
+      <h1 id="units-title">마당 모음</h1>
       <p id="unit-route-message" role="status" hidden></p>
       <ol id="unit-list" class="unit-list"></ol>
     </section>
     <section id="review" aria-labelledby="adventure-title" hidden>
       <h1 id="adventure-title">제주 모험</h1>
-      <p class="adventure-intro">새 유닛에 도달할 때마다 지도에서 새 구역이 열려요.</p>
+      <p class="adventure-intro">새 마당이 열릴 때마다 지도에서 새 구역이 열려요.</p>
       <p id="adventure-progress" role="status"></p>
       <div id="adventure-map" class="adventure-map" role="group" aria-label="제주 지역 지도">
         <svg xmlns="http://www.w3.org/2000/svg" width="840" height="500" viewBox="0 0 840 500">
