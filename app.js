@@ -217,7 +217,7 @@ function start({ units, adventure = [] }, layout) {
         const accuracy = Math.round(firstCorrect / questions.length * 100);
         const earned = Learning.complete(lessons, index);
         body.replaceChildren(
-          element('h3', '', '첫걸음을 마쳤어요!'),
+          element('h3', '', '걸음을 마쳤어요!'),
           element('p', '', '걸린 시간 ' + duration),
           element('p', '', '첫 시도 정답률 ' + accuracy + '% (' + firstCorrect + ' / ' + questions.length + ')'),
           element('p', '', earned ? '경험치 +' + lesson.xp : '모든 문제를 풀었어요.')
@@ -296,67 +296,14 @@ function start({ units, adventure = [] }, layout) {
 
   function showLesson(index) {
     updateLessonHearts = null;
-    const { lessons, number } = units[unitIndex];
+    const { lessons } = units[unitIndex];
     const lesson = lessons[index];
     const state = Learning.progress(lessons).status(index);
     if (state === 'locked') {
       openDialog(lesson.title, element('p', '', '‘' + lessons[index - 1].title + '’ 걸음을 먼저 완료해 주세요.'));
       return;
     }
-    if (lesson.questions?.length) {
-      showFullLesson(lessons, index);
-      return;
-    }
-    const prompt = element('p', '', lesson.question);
-    const feedback = element('p');
-    feedback.setAttribute('role', 'status');
-    const wait = element('p');
-    let selected = -1;
-    const check = button('정답 확인', 'action', () => {
-      if (selected < 0 || !Learning.hearts().count) {
-        refreshHearts();
-        return;
-      }
-      if (selected !== lesson.answer) {
-        Learning.spendHeart();
-        selected = -1;
-        options.forEach(option => option.setAttribute('aria-pressed', 'false'));
-        feedback.textContent = '하트가 하나 줄었어요. 다시 한 번 골라 보세요.';
-        refreshHearts();
-        return;
-      }
-      updateLessonHearts = null;
-      const earned = Learning.complete(lessons, index);
-      feedback.textContent = earned ? '정답이에요! 경험치 +' + lesson.xp : '정답이에요!';
-      options.forEach(option => { option.disabled = true; });
-      check.hidden = true;
-      const done = button('완료', 'action', () => dialog.close());
-      dialogBody.append(done);
-      done.focus();
-      if (earned) render();
-    });
-    check.disabled = true;
-    const options = lesson.options.map((choice, choiceIndex) => {
-      const option = button(choice, 'option', () => {
-        selected = choiceIndex;
-        options.forEach((item, i) => item.setAttribute('aria-pressed', String(i === selected)));
-        feedback.textContent = '';
-        refreshHearts();
-      });
-      option.lang = number === 1 ? 'en' : 'ko';
-      option.setAttribute('aria-pressed', 'false');
-      return option;
-    });
-    updateLessonHearts = heartState => {
-      if (!dialogBody.contains(wait)) return;
-      const empty = heartState.count === 0;
-      check.disabled = empty || selected < 0;
-      options.forEach(option => { option.disabled = empty; });
-      wait.hidden = !empty;
-      if (empty) wait.textContent = '하트를 채우면 다시 풀 수 있어요. ' + refillText(heartState);
-    };
-    openDialog(lesson.title, prompt, ...options, check, feedback, wait);
-    refreshHearts();
+    showFullLesson(lessons, index);
   }
 
   let selectedRegion = 0;
