@@ -168,6 +168,7 @@ body:has(.lesson-screen[open]) { overflow: hidden; }
 .lesson-screen-actions button { text-align: center; padding: .45rem .2rem; font-size: .875rem; white-space: nowrap; }
 .lesson-icon-action { display: grid; grid-template-rows: 24px 1rem; place-items: center; align-content: center; gap: 2px; }
 .lesson-icon-action span { line-height: 1rem; }
+#lesson-submit img { filter: brightness(0) invert(1); }
 .lesson-screen-actions button:disabled { opacity: .55; cursor: default; }
 
 .question-response, .match-column { display: grid; gap: .5rem; min-width: 0; }
