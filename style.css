@@ -43,7 +43,7 @@ progress::-moz-progress-bar { background: #3d8654; border-radius: 1rem; }
   margin-inline-start: clamp(0px, calc(var(--x) - var(--label-width) / 2), calc(100% - var(--label-width)));
   border: 0; background: transparent; color: inherit;
 }
-.disc { position: relative; display: grid; place-items: center; width: min(100%, clamp(52px, var(--diameter), 142px)); aspect-ratio: 1; border: 2px solid #cbd8ce; border-radius: 50%; background: #eef2ee; color: #52655a; font-size: 1.3rem; font-weight: 850; }
+.disc { position: relative; display: grid; place-items: center; width: min(100%, clamp(52px, var(--diameter), 142px)); aspect-ratio: 1; grid-template-rows: minmax(0, 1fr); border: 2px solid #cbd8ce; border-radius: 50%; background: #eef2ee; color: #52655a; font-size: 1.3rem; font-weight: 850; }
 .lesson[data-state="available"] .disc { background: #2e794a; color: #fff; border-color: #20633c; box-shadow: 0 4px 0 #1d5535; }
 .lesson[data-state="complete"] .disc { background: #d9edda; color: #20633c; border-color: #a8cdb0; }
 .lesson:hover .disc { filter: brightness(.95); }
