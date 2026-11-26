@@ -4,6 +4,7 @@ const find = id => document.getElementById(id);
 const path = find('path');
 const dialog = find('dialog');
 const dialogBody = find('dialog-body');
+const lessonScreen = find('lesson-screen');
 const nav = [...document.querySelectorAll('nav button')];
 const labels = { available: '학습 가능', locked: '잠김', complete: '완료' };
 const dateFormat = new Intl.DateTimeFormat('ko-KR', { dateStyle: 'medium', timeStyle: 'short' });
@@ -61,7 +62,7 @@ function start({ units, adventure = [] }, layout) {
     }
     const timer = dialogBody.querySelector('[data-heart-timer]');
     if (dialog.open && timer) timer.textContent = refillText(heartState);
-    if (dialog.open) updateLessonHearts?.(heartState);
+    if (dialog.open || lessonScreen.open) updateLessonHearts?.(heartState);
   }
 
   heartButton.addEventListener('click', () => {
@@ -71,6 +72,107 @@ function start({ units, adventure = [] }, layout) {
     openDialog('하트', element('p', '', '오답마다 하트가 하나 줄어요. 10분마다 하나씩, 최대 5개까지 채워져요.'), timer);
   });
 
+  function showFullLesson(lessons, index) {
+    const lesson = lessons[index];
+    const questions = lesson.questions;
+    const answers = questions.map(() => ({ choice: -1, correct: false, hint: false, feedback: '' }));
+    const body = find('lesson-screen-body');
+    const step = find('lesson-screen-step');
+    const wait = element('p', 'lesson-screen-wait');
+    let current = 0;
+    let finished = false;
+    let options = [];
+    const back = button('뒤로', 'option', () => move(-1));
+    const forward = button('앞으로', 'option', () => move(1));
+    const hint = button('힌트', 'option', () => {
+      answers[current].hint = !answers[current].hint;
+      paint();
+    });
+    const submit = button('제출', 'action', () => {
+      if (finished) {
+        lessonScreen.close();
+        return;
+      }
+      const answer = answers[current];
+      if (answer.correct || answer.choice < 0 || !Learning.hearts().count) return;
+      if (answer.choice === questions[current].answer) {
+        answer.correct = true;
+        answer.feedback = '정답이에요! 앞으로를 눌러 다음 문제로 가세요.';
+        if (answers.every(item => item.correct)) {
+          finished = true;
+          const earned = Learning.complete(lessons, index);
+          body.replaceChildren(
+            element('h3', '', '첫걸음을 마쳤어요!'),
+            element('p', '', earned ? '경험치 +' + lesson.xp : '모든 문제를 풀었어요.')
+          );
+          step.textContent = questions.length + ' / ' + questions.length;
+          submit.textContent = '완료';
+          refreshHearts();
+          if (earned) render();
+          submit.focus();
+          return;
+        }
+      } else {
+        Learning.spendHeart();
+        answer.choice = -1;
+        answer.feedback = '하트가 하나 줄었어요. 다시 골라 보세요.';
+      }
+      paint();
+      const destination = answer.correct ? forward : options[0];
+      if (!destination.disabled) destination.focus();
+    });
+
+    function move(offset) {
+      current += offset;
+      paint();
+      body.querySelector('h3').focus();
+    }
+
+    function paint() {
+      const question = questions[current];
+      const answer = answers[current];
+      step.textContent = '문제 ' + (current + 1) + ' / ' + questions.length;
+      const heading = element('h3', '', question.question);
+      heading.tabIndex = -1;
+      options = question.options.map((choice, choiceIndex) =>
+        button(choice, 'option', () => {
+          answer.choice = choiceIndex;
+          answer.feedback = '';
+          feedback.textContent = '';
+          refreshHearts();
+        }));
+      const hintText = element('p', 'lesson-screen-hint', question.hint);
+      hintText.id = 'lesson-hint-text';
+      hintText.hidden = !answer.hint;
+      hint.setAttribute('aria-controls', hintText.id);
+      hint.setAttribute('aria-expanded', String(answer.hint));
+      const feedback = element('p', '', answer.feedback);
+      feedback.setAttribute('role', 'status');
+      body.replaceChildren(heading, ...options, hintText, feedback, wait);
+      refreshHearts();
+    }
+
+    updateLessonHearts = heartState => {
+      if (!lessonScreen.open) return;
+      const answer = answers[current];
+      const empty = !heartState.count;
+      back.disabled = finished || current === 0;
+      forward.disabled = finished || !answer.correct || current === questions.length - 1;
+      hint.disabled = finished;
+      submit.disabled = !finished && (empty || answer.correct || answer.choice < 0);
+      options.forEach((option, i) => {
+        option.disabled = empty || answer.correct;
+        option.setAttribute('aria-pressed', String(i === answer.choice));
+      });
+      wait.hidden = !empty;
+      if (empty) wait.textContent = '하트를 채우면 다시 풀 수 있어요. ' + refillText(heartState);
+    };
+    find('lesson-screen-title').textContent = lesson.title;
+    find('lesson-screen-actions').replaceChildren(back, forward, hint, submit);
+    lessonScreen.showModal();
+    paint();
+  }
+
   function showLesson(index) {
     updateLessonHearts = null;
     const { lessons, number } = units[unitIndex];
@@ -78,6 +180,10 @@ function start({ units, adventure = [] }, layout) {
     const state = Learning.progress(lessons).status(index);
     if (state === 'locked') {
       openDialog(lesson.title, element('p', '', '‘' + lessons[index - 1].title + '’ 걸음을 먼저 완료해 주세요.'));
+      return;
+    }
+    if (lesson.questions?.length) {
+      showFullLesson(lessons, index);
       return;
     }
     const prompt = element('p', '', lesson.question);
@@ -316,6 +422,7 @@ function start({ units, adventure = [] }, layout) {
       page = tab === 'review' || tab === 'history' ? tab : 'learn';
     }
     if (dialog.open) dialog.close();
+    if (lessonScreen.open) lessonScreen.close();
     pages.forEach(id => { find(id).hidden = id !== page; });
     nav.forEach(control => {
       if (control.dataset.page === (page === 'units' ? 'learn' : page)) control.setAttribute('aria-current', 'page');
@@ -343,7 +450,7 @@ function start({ units, adventure = [] }, layout) {
 async function getData(name) {
   const embedded = find(name + '-data');
   if (embedded) return JSON.parse(embedded.textContent);
-  const response = await fetch('./' + name + '.json?v=next-unit-wide');
+  const response = await fetch('./' + name + '.json?v=full-lesson');
   if (!response.ok) throw new Error(name);
   return response.json();
 }
