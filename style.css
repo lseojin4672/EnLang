@@ -147,6 +147,7 @@ body:has(.lesson-screen[open]) { overflow: hidden; }
 .lesson-screen-status { display: flex; align-items: center; gap: .4rem; flex: none; }
 .lesson-screen-status .lesson-hearts { padding: .35rem .5rem; border-radius: 99px; background: #fae7e7; color: #8c253d; font-size: .8125rem; font-weight: 800; white-space: nowrap; }
 .lesson-screen-status .lesson-hearts span { color: inherit; font: inherit; }
+.lesson-screen-status .lesson-elapsed { padding: .35rem .45rem; border-radius: 99px; background: #e8f1e7; font-size: .8125rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .lesson-close { display: grid; place-items: center; padding: 0; inline-size: 44px; block-size: 44px; border: 1px solid var(--line); border-radius: .75rem; background: #fff; color: var(--green); }
 .lesson-screen-scroll { overflow: auto; }
 .lesson-screen-body { display: grid; gap: .8rem; padding: clamp(1rem, 5vw, 2rem); }

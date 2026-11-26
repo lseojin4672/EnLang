@@ -83,7 +83,14 @@ function start({ units, adventure = [] }, layout) {
   function showFullLesson(lessons, index) {
     const lesson = lessons[index];
     const questions = lesson.questions;
-    const answers = questions.map(() => ({ choice: -1, correct: false, hint: false, feedback: '' }));
+    const makeAttempt = questionIndex => ({ questionIndex, choice: -1, correct: null, hint: false });
+    const attempts = questions.map((question, questionIndex) => makeAttempt(questionIndex));
+    const startedAt = Date.now();
+    const timer = find('lesson-elapsed');
+    const elapsed = () => {
+      const seconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+      return String(Math.floor(seconds / 60)).padStart(2, '0') + ':' + String(seconds % 60).padStart(2, '0');
+    };
     const body = find('lesson-screen-body');
     const step = find('lesson-screen-step');
     const wait = element('p', 'lesson-screen-wait');
@@ -93,7 +100,7 @@ function start({ units, adventure = [] }, layout) {
     const back = button('뒤로', 'option', () => move(-1));
     const forward = button('앞으로', 'option', () => move(1));
     const hint = button('힌트', 'option', () => {
-      answers[current].hint = !answers[current].hint;
+      attempts[current].hint = !attempts[current].hint;
       paint();
     });
     const submit = button('제출', 'action', () => {
@@ -101,37 +108,38 @@ function start({ units, adventure = [] }, layout) {
         lessonScreen.close();
         return;
       }
-      const answer = answers[current];
-      if (answer.correct) {
-        if (current < questions.length - 1) move(1);
+      const answer = attempts[current];
+      if (answer.correct !== null) {
+        if (current < attempts.length - 1) move(1);
         return;
       }
       if (answer.choice < 0 || !Learning.hearts().count) return;
-      if (answer.choice === questions[current].answer) {
-        answer.correct = true;
-        answer.feedback = '정답이에요! 앞으로나 제출을 누르면 다음 문제로 넘어가요.';
-        if (answers.every(item => item.correct)) {
-          finished = true;
-          const earned = Learning.complete(lessons, index);
-          body.replaceChildren(
-            element('h3', '', '첫걸음을 마쳤어요!'),
-            element('p', '', earned ? '경험치 +' + lesson.xp : '모든 문제를 풀었어요.')
-          );
-          step.textContent = questions.length + ' / ' + questions.length;
-          submit.textContent = '완료';
-          refreshHearts();
-          if (earned) render();
-          submit.focus();
-          return;
-        }
-      } else {
+      answer.correct = answer.choice === questions[answer.questionIndex].answer;
+      if (!answer.correct) {
         Learning.spendHeart();
-        answer.choice = -1;
-        answer.feedback = '하트가 하나 줄었어요. 다시 골라 보세요.';
+        attempts.push(makeAttempt(answer.questionIndex));
+      } else if (current === attempts.length - 1) {
+        finished = true;
+        const duration = elapsed();
+        timer.textContent = duration;
+        const firstCorrect = attempts.slice(0, questions.length).filter(item => item.correct).length;
+        const accuracy = Math.round(firstCorrect / questions.length * 100);
+        const earned = Learning.complete(lessons, index);
+        body.replaceChildren(
+          element('h3', '', '첫걸음을 마쳤어요!'),
+          element('p', '', '걸린 시간 ' + duration),
+          element('p', '', '첫 시도 정답률 ' + accuracy + '% (' + firstCorrect + ' / ' + questions.length + ')'),
+          element('p', '', earned ? '경험치 +' + lesson.xp : '모든 문제를 풀었어요.')
+        );
+        step.textContent = questions.length + ' / ' + questions.length;
+        submit.textContent = '완료';
+        refreshHearts();
+        if (earned) render();
+        submit.focus();
+        return;
       }
       paint();
-      const destination = answer.correct ? forward : options[0];
-      if (!destination.disabled) destination.focus();
+      forward.focus();
     });
 
     function move(offset) {
@@ -141,16 +149,16 @@ function start({ units, adventure = [] }, layout) {
     }
 
     function paint() {
-      const question = questions[current];
-      const answer = answers[current];
-      step.textContent = '문제 ' + (current + 1) + ' / ' + questions.length;
+      const answer = attempts[current];
+      const question = questions[answer.questionIndex];
+      step.textContent = current < questions.length
+        ? '문제 ' + (answer.questionIndex + 1) + ' / ' + questions.length
+        : (answer.questionIndex + 1) + '번 (재시도)';
       const heading = element('h3', '', question.question);
       heading.tabIndex = -1;
       options = question.options.map((choice, choiceIndex) =>
         button(choice, 'option', () => {
           answer.choice = choiceIndex;
-          answer.feedback = '';
-          feedback.textContent = '';
           refreshHearts();
         }));
       const hintText = element('p', 'lesson-screen-hint', question.hint);
@@ -158,7 +166,9 @@ function start({ units, adventure = [] }, layout) {
       hintText.hidden = !answer.hint;
       hint.setAttribute('aria-controls', hintText.id);
       hint.setAttribute('aria-expanded', String(answer.hint));
-      const feedback = element('p', '', answer.feedback);
+      const feedback = element('p', '', answer.correct === null ? '' : answer.correct
+        ? '정답이에요! 앞으로나 제출을 누르면 다음 문제로 넘어가요.'
+        : '하트가 하나 줄었어요. 이 문제는 뒤에서 다시 풀어요.');
       feedback.setAttribute('role', 'status');
       body.replaceChildren(heading, ...options, hintText, feedback, wait);
       refreshHearts();
@@ -166,17 +176,22 @@ function start({ units, adventure = [] }, layout) {
 
     updateLessonHearts = heartState => {
       if (!lessonScreen.open) return;
-      const answer = answers[current];
+      const answer = attempts[current];
+      if (!finished) {
+        const duration = elapsed();
+        if (timer.textContent !== duration) timer.textContent = duration;
+      }
       const empty = !heartState.count;
+      const graded = answer.correct !== null;
       back.disabled = finished || current === 0;
-      forward.disabled = finished || !answer.correct || current === questions.length - 1;
+      forward.disabled = finished || !graded || current === attempts.length - 1;
       hint.disabled = finished;
-      submit.disabled = !finished && (answer.correct ? forward.disabled : empty || answer.choice < 0);
+      submit.disabled = !finished && (graded ? forward.disabled : empty || answer.choice < 0);
       options.forEach((option, i) => {
-        option.disabled = empty || answer.correct;
+        option.disabled = empty || graded;
         option.setAttribute('aria-pressed', String(i === answer.choice));
       });
-      wait.hidden = !empty;
+      wait.hidden = finished || !empty;
       if (empty) wait.textContent = '하트를 채우면 다시 풀 수 있어요. ' + refillText(heartState);
     };
     find('lesson-screen-title').textContent = lesson.title;
