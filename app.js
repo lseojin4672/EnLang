@@ -264,7 +264,7 @@ function start({ units, adventure = [] }, layout) {
 async function getData(name) {
   const embedded = find(name + '-data');
   if (embedded) return JSON.parse(embedded.textContent);
-  const response = await fetch('./' + name + '.json?v=unit-review');
+  const response = await fetch('./' + name + '.json?v=next-unit-wide');
   if (!response.ok) throw new Error(name);
   return response.json();
 }

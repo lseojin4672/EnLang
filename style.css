@@ -54,7 +54,7 @@ progress::-moz-progress-bar { background: #3d8654; border-radius: 1rem; }
 .lock::before { content: ""; position: absolute; width: 9px; height: 8px; border: 2px solid currentColor; border-bottom: 0; border-radius: 8px 8px 0 0; left: 50%; bottom: 100%; transform: translateX(-50%); }
 .lock::after { content: ""; position: absolute; width: 2px; height: 5px; background: currentColor; top: 3px; left: 50%; transform: translateX(-50%); }
 .next { margin-top: 1.5rem; display: flex; align-items: center; gap: 1rem; background: #e6f1e3; color: #235c37; border-radius: 1.15rem; padding: 1rem 1.2rem; }
-.next div { display: grid; gap: .2rem; }
+.next div { display: grid; flex: 1; min-width: 0; gap: .2rem; }
 .next span, .next small { font-size: .875rem; }
 nav { position: sticky; bottom: 0; z-index: 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; padding: .5rem 1rem max(.5rem, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: #fbfcf9; }
 nav button { display: grid; grid-template-rows: 24px 1rem; place-items: center; align-content: center; gap: 2px; min-height: 56px; border: 0; border-radius: .85rem; background: transparent; color: var(--muted); font-size: .875rem; font-weight: 750; }
@@ -103,7 +103,7 @@ dialog h2 { padding-right: 3rem; margin: .45rem 0 1.2rem; }
 .unit-title-link { display: block; text-decoration: none; }
 .unit-title-link h1, .unit-card strong { white-space: pre-line; word-break: keep-all; text-wrap: balance; }
 .unit-title-link:focus-visible, .unit-link:focus-visible, .unit-card:focus-visible { outline: 3px solid #94640a; outline-offset: 3px; }
-.unit-link { display: inline-flex; align-items: center; justify-self: start; text-decoration: none; margin-top: .4rem; }
+.unit-link { display: inline-flex; align-items: center; justify-content: center; justify-self: stretch; text-align: center; text-decoration: none; margin-top: .4rem; }
 .unit-list { display: grid; gap: .75rem; list-style: none; padding: 0; margin: 1rem 0; }
 .unit-card { display: grid; gap: .25rem; min-height: 44px; padding: .85rem 1rem; border: 1px solid var(--line); border-radius: .9rem; background: #fff; color: var(--green); text-decoration: none; }
 .unit-card[aria-current="page"] { background: #e2f0df; border-color: #87b696; }
