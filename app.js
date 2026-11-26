@@ -394,7 +394,7 @@ function start({ units, adventure = [] }, layout) {
       const character = element('div', 'unit-card-character');
       character.setAttribute('aria-hidden', 'true');
       const image = element('img');
-      image.src = unit.character ?? './assets/PaDuck.svg';
+      image.src = unit.character ?? './assets/고라파덕 (lorem ipsum).jpg';
       image.alt = '';
       character.append(image);
       card.append(info, character);
