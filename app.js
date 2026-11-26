@@ -393,14 +393,10 @@ function start({ units, adventure = [] }, layout) {
       }
       const character = element('div', 'unit-card-character');
       character.setAttribute('aria-hidden', 'true');
-      if (unit.character) {
-        const image = element('img');
-        image.src = unit.character;
-        image.alt = '';
-        character.append(image);
-      } else {
-        character.textContent = '🐤';
-      }
+      const image = element('img');
+      image.src = unit.character ?? './assets/PaDuck.svg';
+      image.alt = '';
+      character.append(image);
       card.append(info, character);
       row.append(card);
       return row;
