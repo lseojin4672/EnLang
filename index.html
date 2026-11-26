@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8faf6">
 <title>EnLang · 제주어 학습</title>
-<link rel="stylesheet" href="./style.css?v=question-types">
+<link rel="stylesheet" href="./style.css?v=lesson-icons">
 <script defer src="./learning.js?v=hearts"></script>
 <script defer src="./layout.js"></script>
-<script defer src="./app.js?v=question-types"></script>
+<script defer src="./app.js?v=lesson-icons"></script>
 </head>
 <body>
 <div class="app">
@@ -203,7 +203,7 @@
       <div><span id="lesson-screen-step"></span><h2 id="lesson-screen-title"></h2></div>
       <div class="lesson-screen-status">
         <output class="lesson-hearts" aria-label="남은 하트"><span aria-hidden="true">♥</span> <span id="lesson-heart-value"></span></output>
-        <span id="lesson-elapsed" class="lesson-elapsed" role="timer" aria-label="걸린 시간">00:00</span>
+        <span class="lesson-elapsed"><img src="./assets/time.svg" alt="" width="16" height="16"><span id="lesson-elapsed" role="timer" aria-label="걸린 시간">00:00</span></span>
         <form method="dialog"><button class="lesson-close" aria-label="닫기" autofocus><img src="./assets/close.svg" alt="" width="24" height="24"></button></form>
       </div>
     </header>

@@ -223,7 +223,7 @@ function start({ units, adventure = [] }, layout) {
           element('p', '', earned ? '경험치 +' + lesson.xp : '모든 문제를 풀었어요.')
         );
         step.textContent = questions.length + ' / ' + questions.length;
-        submit.textContent = '완료';
+        submit.lastElementChild.textContent = '완료';
         refreshHearts();
         if (earned) render();
         submit.focus();
@@ -279,7 +279,7 @@ function start({ units, adventure = [] }, layout) {
       if (empty) wait.textContent = '하트를 채우면 다시 풀 수 있어요. ' + refillText(heartState);
     };
     find('lesson-screen-title').textContent = lesson.title;
-    for (const [control, asset] of [[back, 'back.svg'], [forward, 'next.svg'], [hint, 'info.svg']]) {
+    for (const [control, asset] of [[back, 'previous.svg'], [forward, 'next.svg'], [hint, 'hint.svg'], [submit, 'submit.svg']]) {
       const icon = element('img');
       icon.src = './assets/' + asset;
       icon.alt = '';
