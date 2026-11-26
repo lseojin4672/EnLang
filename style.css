@@ -93,7 +93,7 @@ dialog h2 { padding-right: 3rem; margin: .45rem 0 1.2rem; }
 #adventure-progress { margin: 0 0 .6rem; color: var(--green); font-weight: 750; }
 .adventure-map { position: relative; aspect-ratio: 840 / 500; background: #e2f1f3; border: 1px solid #c9e0e4; border-radius: 1.2rem; }
 .adventure-map > svg { display: block; width: 100%; height: auto; }
-.zone-target { fill: transparent; cursor: pointer; }
+.zone-target { fill: transparent; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent; }
 .zone-target:focus-visible { outline: none; stroke: #215737; stroke-width: 5; stroke-dasharray: 7 4; }
 .region-lock { position: absolute; transform: translate(-50%, -50%); margin: 0; color: #53645a; pointer-events: none; }
 .adventure-detail { margin-top: .85rem; border: 1px solid var(--line); border-radius: 1rem; background: #f1f7ec; padding: .9rem 1rem; }
