@@ -166,6 +166,7 @@ function start({ units, adventure = [] }, layout) {
     const total = Learning.progress(allLessons);
     const next = units[unitIndex + 1];
     const nextOpen = Boolean(next && canEnter(unitIndex + 1, total));
+    find('learn-logo').href = unitHref(unit);
     find('unit').textContent = 'UNIT ' + unit.number;
     find('title').textContent = unit.title;
     find('description').textContent = unit.description;
