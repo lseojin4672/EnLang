@@ -195,7 +195,7 @@ function start({ unit, adventure = [] }, layout) {
 async function getData(name) {
   const embedded = find(name + '-data');
   if (embedded) return JSON.parse(embedded.textContent);
-  const response = await fetch('./' + name + '.json' + (name === 'content' ? '?v=jeju-map-touch' : ''));
+  const response = await fetch('./' + name + '.json' + (name === 'content' ? '?v=jeju-curriculum' : ''));
   if (!response.ok) throw new Error(name);
   return response.json();
 }
