@@ -19,8 +19,9 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid #94640a; out
 }
 .brand { font-size: 1.55rem; font-weight: 850; letter-spacing: -.055em; color: #173b29; }
 .brand span { color: #36774d; }
-.xp { background: #fcf0cf; color: #634302; font-size: .875rem; font-weight: 800; padding: .45rem .75rem; border-radius: 99px; white-space: nowrap; }
+.xp { display: inline-flex; align-items: center; gap: .3rem; background: #fcf0cf; color: #634302; font-size: .875rem; font-weight: 800; padding: .45rem .75rem; border-radius: 99px; white-space: nowrap; }
 .settings, .close button { color: var(--green); border: 1px solid var(--line); background: #fff; border-radius: .8rem; width: 44px; height: 44px; font-size: 1.4rem; justify-self: end; }
+.settings { display: grid; place-items: center; padding: 0; }
 main { flex: 1; padding: 1.15rem clamp(.75rem, 5vw, 1.5rem) 1.35rem; min-width: 0; }
 .banner { border-radius: 1.4rem; background: #23683f; color: #fff; padding: 1.25rem 1.4rem 1.4rem; }
 .banner span { color: #ccebd1; font-size: .875rem; font-weight: 800; letter-spacing: .08em; }

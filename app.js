@@ -122,7 +122,7 @@ function start({ unit, adventure = [] }, layout) {
 
   function render() {
     const progress = Learning.progress(lessons);
-    find('xp').textContent = '⚡ ' + progress.xp + ' XP';
+    find('xp-value').textContent = progress.xp + ' XP';
     find('count').textContent = progress.completed.length + ' / ' + lessons.length;
     find('progress').max = lessons.length;
     find('progress').value = progress.completed.length;
