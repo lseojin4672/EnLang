@@ -21,16 +21,21 @@ const LessonLayout = (() => {
     let previous;
     for (const disc of discs) {
       const rect = disc.getBoundingClientRect();
-      const center = { x: rect.left + rect.width / 2 - area.left, y: rect.top + rect.height / 2 - area.top };
+      const center = {
+        x: rect.left + rect.width / 2 - area.left,
+        y: rect.top + rect.height / 2 - area.top,
+        radius: rect.width / 2
+      };
       if (previous) {
         const line = document.createElement('li');
         line.className = 'connector';
         line.setAttribute('aria-hidden', 'true');
         const dx = center.x - previous.x;
         const dy = center.y - previous.y;
-        line.style.left = previous.x + 'px';
-        line.style.top = previous.y + 'px';
-        line.style.width = Math.hypot(dx, dy) + 'px';
+        const distance = Math.hypot(dx, dy);
+        line.style.left = previous.x + dx * previous.radius / distance + 'px';
+        line.style.top = previous.y + dy * previous.radius / distance - 1 + 'px';
+        line.style.width = Math.max(0, distance - previous.radius - center.radius) + 'px';
         line.style.transform = 'rotate(' + Math.atan2(dy, dx) + 'rad)';
         path.prepend(line);
       }
