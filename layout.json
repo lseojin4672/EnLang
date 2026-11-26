@@ -60,6 +60,26 @@
         "available": "./assets/lesson-active.svg",
         "complete": "./assets/lesson-final.svg"
       }
-    }
+    },
+    "lesson-2-1": {"x": 50, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-2-2": {"x": 41, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-2-3": {"x": 59, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-2-4": {"x": 41, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-grammar.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-2-5": {"x": 50, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-3-1": {"x": 50, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-3-2": {"x": 41, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-3-3": {"x": 59, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-3-4": {"x": 41, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-grammar.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-3-5": {"x": 50, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-4-1": {"x": 50, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-4-2": {"x": 41, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-4-3": {"x": 59, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-4-4": {"x": 41, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-grammar.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-4-5": {"x": 50, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-5-1": {"x": 50, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-5-2": {"x": 41, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-5-3": {"x": 59, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-5-4": {"x": 41, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-grammar.svg", "complete": "./assets/lesson-complete.svg"}},
+    "lesson-5-5": {"x": 50, "gap": 4, "size": 19, "sprite": {"locked": "./assets/lesson-locked.svg", "available": "./assets/lesson-active.svg", "complete": "./assets/lesson-final.svg"}}
   }
 }

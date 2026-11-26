@@ -99,3 +99,13 @@ dialog h2 { padding-right: 3rem; margin: .45rem 0 1.2rem; }
 .adventure-detail h2 { font-size: 1.15rem; margin: 0; }
 .adventure-detail p { margin: .4rem 0; line-height: 1.5; }
 .adventure-detail .action { margin-top: .35rem; }
+
+.unit-title-link { display: inline-block; color: inherit; text-decoration: underline; text-underline-offset: .16em; }
+.unit-title-link:focus-visible, .unit-link:focus-visible, .unit-card:focus-visible { outline: 3px solid #94640a; outline-offset: 3px; }
+.unit-link { display: inline-flex; align-items: center; justify-self: start; text-decoration: none; margin-top: .4rem; }
+.unit-list { display: grid; gap: .75rem; list-style: none; padding: 0; margin: 1rem 0; }
+.unit-card { display: grid; gap: .25rem; min-height: 44px; padding: .85rem 1rem; border: 1px solid var(--line); border-radius: .9rem; background: #fff; color: var(--green); text-decoration: none; }
+.unit-card[aria-current="page"] { background: #e2f0df; border-color: #87b696; }
+.unit-card-locked { grid-template-columns: 1fr auto; align-items: center; background: #f0f2ed; color: var(--muted); }
+.unit-card-locked small { grid-column: 1; }
+.unit-card-locked .lock { grid-column: 2; grid-row: 1 / span 2; }

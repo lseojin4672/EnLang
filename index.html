@@ -5,20 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8faf6">
 <title>EnLang · 제주어 학습</title>
-<link rel="stylesheet" href="./style.css?v=jeju-map-touch">
+<link rel="stylesheet" href="./style.css?v=units-v1">
 <script defer src="./learning.js"></script>
 <script defer src="./layout.js"></script>
-<script defer src="./app.js?v=jeju-curriculum"></script>
+<script defer src="./app.js?v=units-v1"></script>
 </head>
 <body>
 <div class="app">
   <header class="top"><img src="./assets/EnLang-logo-horizontal.svg" alt="EnLang" width="112" height="34" style="display: block; max-width: 100%; height: auto;"><output id="xp" class="xp" aria-label="경험치"><img src="./assets/xp.svg" alt="" width="16" height="16"><span id="xp-value"></span></output><button id="settings" class="settings" aria-label="설정"><img src="./assets/settings.svg" alt="" width="22" height="22"></button></header>
   <main id="main">
     <section id="learn" aria-label="학습">
-      <header class="banner"><span id="unit"></span><h1 id="title"></h1><p id="description"></p></header>
+      <header class="banner"><span id="unit"></span><h1><a id="title" class="unit-title-link" href="#/units"></a></h1><p id="description"></p></header>
       <section class="progress"><div><strong>학습 진행도</strong><span id="count"></span></div><progress id="progress" aria-label="학습 진행도"></progress></section>
       <ol id="path" class="path" aria-label="레슨 경로"></ol>
-      <aside class="next"><span class="lock" aria-hidden="true"></span><div><span>다음 유닛</span><strong id="next"></strong><small id="next-status"></small></div></aside>
+      <aside id="next-unit" class="next">
+        <span id="next-lock" class="lock" aria-hidden="true"></span>
+        <div><span>다음 유닛</span><strong id="next"></strong><small id="next-status"></small><a id="next-link" class="action unit-link" hidden>다음 유닛으로</a></div>
+      </aside>
+    </section>
+    <section id="units" aria-labelledby="units-title" hidden>
+      <h1 id="units-title">유닛 모음</h1>
+      <p id="unit-route-message" role="status" hidden></p>
+      <ol id="unit-list" class="unit-list"></ol>
+      <a id="return-unit" href="#/unit/1">학습으로 돌아가기</a>
     </section>
     <section id="review" aria-labelledby="adventure-title" hidden>
       <h1 id="adventure-title">제주 모험</h1>

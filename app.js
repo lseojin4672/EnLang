@@ -28,14 +28,18 @@ function openDialog(title, ...children) {
   if (!dialog.open) dialog.showModal();
 }
 
-function start({ unit, adventure = [] }, layout) {
-  const { lessons } = unit;
-  find('unit').textContent = 'UNIT ' + unit.number;
-  find('title').textContent = unit.title;
-  find('description').textContent = unit.description;
-  find('next').textContent = unit.nextTitle;
+function start({ units, adventure = [] }, layout) {
+  const allLessons = units.flatMap(unit => unit.lessons);
+  let unitIndex = 0;
+  let page = 'learn';
+  let routeMessage = '';
+  const pages = ['learn', 'units', 'review', 'history'];
+  const unitHref = unit => '#/unit/' + unit.number;
+  const canEnter = (index, progress) => units.slice(0, index)
+    .every(unit => unit.lessons.every(lesson => progress.completed.includes(lesson)));
 
   function showLesson(index) {
+    const { lessons, number } = units[unitIndex];
     const lesson = lessons[index];
     const state = Learning.progress(lessons).status(index);
     if (state === 'locked') {
@@ -68,7 +72,7 @@ function start({ unit, adventure = [] }, layout) {
         feedback.textContent = '';
         check.disabled = false;
       });
-      option.lang = 'en';
+      option.lang = number === 1 ? 'en' : 'ko';
       option.setAttribute('aria-pressed', 'false');
       return option;
     });
@@ -105,7 +109,8 @@ function start({ unit, adventure = [] }, layout) {
 
   function renderAdventure() {
     if (!regions.length) return;
-    const currentUnit = unit.number;
+    const progress = Learning.progress(allLessons);
+    const currentUnit = units.filter((unit, index) => canEnter(index, progress)).at(-1).number;
     const openCount = adventure.filter(region => region.unit <= currentUnit).length;
     find('adventure-progress').textContent = openCount + ' / ' + adventure.length + ' 구역 해금';
     regions.forEach(({ target, lock, mask }, index) => {
@@ -126,18 +131,58 @@ function start({ unit, adventure = [] }, layout) {
   }
 
   find('region-learn')?.addEventListener('click', () => {
-    nav.find(control => control.dataset.page === 'learn').click();
+    location.hash = unitHref(units[unitIndex]);
   });
 
+  function renderUnits(progress) {
+    const list = find('unit-list');
+    list.replaceChildren(...units.map((unit, index) => {
+      const row = element('li');
+      const open = canEnter(index, progress);
+      const card = element(open ? 'a' : 'div', open ? 'unit-card' : 'unit-card unit-card-locked');
+      const count = unit.lessons.filter(lesson => progress.completed.includes(lesson)).length;
+      card.append(element('strong', '', '유닛 ' + unit.number + ' · ' + unit.title));
+      if (open) {
+        card.href = unitHref(unit);
+        if (index === unitIndex) card.setAttribute('aria-current', 'page');
+        card.append(element('small', '', count + ' / ' + unit.lessons.length + ' 완료'));
+      } else {
+        card.append(element('small', '', '유닛 ' + units[index - 1].number + '을 완료하면 열려요.'));
+        const lock = element('span', 'lock');
+        lock.setAttribute('aria-hidden', 'true');
+        card.append(lock);
+      }
+      row.append(card);
+      return row;
+    }));
+    find('return-unit').href = unitHref(units[unitIndex]);
+    find('unit-route-message').hidden = !routeMessage;
+    find('unit-route-message').textContent = routeMessage;
+  }
+
   function render() {
+    const unit = units[unitIndex];
+    const { lessons } = unit;
     const progress = Learning.progress(lessons);
-    find('xp-value').textContent = progress.xp + ' XP';
+    const total = Learning.progress(allLessons);
+    const next = units[unitIndex + 1];
+    const nextOpen = Boolean(next && canEnter(unitIndex + 1, total));
+    find('unit').textContent = 'UNIT ' + unit.number;
+    find('title').textContent = unit.title;
+    find('description').textContent = unit.description;
+    find('xp-value').textContent = total.xp + ' XP';
     find('count').textContent = progress.completed.length + ' / ' + lessons.length;
     find('progress').max = lessons.length;
     find('progress').value = progress.completed.length;
-    find('next-status').textContent = progress.completed.length === lessons.length
-      ? '다음 유닛은 준비 중이에요.'
-      : '현재 유닛을 완료하면 열려요.';
+    find('next-unit').hidden = !next;
+    find('next-lock').hidden = nextOpen;
+    find('next').textContent = next ? '유닛 ' + next.number + ' · ' + next.title : '';
+    find('next-status').textContent = nextOpen ? '다음 유닛이 열렸어요.' : '현재 유닛을 완료하면 열려요.';
+    const nextLink = find('next-link');
+    nextLink.hidden = !nextOpen;
+    if (nextOpen) nextLink.href = unitHref(next);
+    else nextLink.removeAttribute('href');
+    if (page === 'units') renderUnits(total);
     const existing = [...path.querySelectorAll('.lesson-row')];
     lessons.forEach((lesson, index) => {
       const state = progress.status(index);
@@ -169,33 +214,57 @@ function start({ unit, adventure = [] }, layout) {
     });
     LessonLayout.connect(path);
     renderAdventure();
-    find('history-list').replaceChildren(...(progress.completed.length
-      ? [...progress.completed].sort((a, b) => progress.date(b.id).localeCompare(progress.date(a.id))).map(lesson =>
-        element('div', 'record', lesson.title + ' · +' + lesson.xp + ' XP · ' + dateFormat.format(new Date(progress.date(lesson.id)))))
+    find('history-list').replaceChildren(...(total.completed.length
+      ? [...total.completed].sort((a, b) => total.date(b.id).localeCompare(total.date(a.id))).map(lesson =>
+        element('div', 'record', lesson.title + ' · +' + lesson.xp + ' XP · ' + dateFormat.format(new Date(total.date(lesson.id)))))
       : [element('p', '', '아직 완료한 레슨이 없어요.')]));
   }
 
-  nav.forEach(control => control.addEventListener('click', () => {
-    nav.forEach(item => {
-      find(item.dataset.page).hidden = item !== control;
-      if (item === control) item.setAttribute('aria-current', 'page');
-      else item.removeAttribute('aria-current');
+  function renderRoute() {
+    const hash = location.hash;
+    const requested = /^#\/unit\/(\d+)$/.exec(hash || '#/unit/1');
+    const index = requested ? units.findIndex(unit => unit.number === Number(requested[1])) : -1;
+    routeMessage = '';
+    if (requested && index >= 0 && canEnter(index, Learning.progress(allLessons))) {
+      if (index !== unitIndex) path.replaceChildren();
+      unitIndex = index;
+      page = 'learn';
+    } else if (requested || hash === '#/units') {
+      page = 'units';
+      if (requested) {
+        routeMessage = index < 0 ? '해당 유닛을 찾을 수 없어요.' : '앞 유닛을 먼저 완료해 주세요.';
+        history.replaceState(null, '', '#/units');
+      }
+    } else {
+      const tab = hash.slice(2);
+      page = tab === 'review' || tab === 'history' ? tab : 'learn';
+    }
+    if (dialog.open) dialog.close();
+    pages.forEach(id => { find(id).hidden = id !== page; });
+    nav.forEach(control => {
+      if (control.dataset.page === (page === 'units' ? 'learn' : page)) control.setAttribute('aria-current', 'page');
+      else control.removeAttribute('aria-current');
     });
-    if (control.dataset.page === 'learn') LessonLayout.connect(path);
+    render();
     window.scrollTo(0, 0);
+  }
+
+  nav.forEach(control => control.addEventListener('click', () => {
+    location.hash = control.dataset.page === 'learn' ? unitHref(units[unitIndex]) : '#/' + control.dataset.page;
   }));
+  window.addEventListener('hashchange', renderRoute);
   find('settings').addEventListener('click', () => openDialog('설정',
     element('p', '', '학습 언어 · 제주어'),
     element('p', '', '학습 기록은 이 브라우저에 저장돼요.')));
   window.addEventListener('storage', render);
   new ResizeObserver(() => LessonLayout.connect(path)).observe(path);
-  render();
+  renderRoute();
 }
 
 async function getData(name) {
   const embedded = find(name + '-data');
   if (embedded) return JSON.parse(embedded.textContent);
-  const response = await fetch('./' + name + '.json' + (name === 'content' ? '?v=jeju-curriculum' : ''));
+  const response = await fetch('./' + name + '.json?v=units-v1');
   if (!response.ok) throw new Error(name);
   return response.json();
 }
