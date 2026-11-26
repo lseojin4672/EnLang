@@ -42,5 +42,40 @@ const Learning = (() => {
     return true;
   }
 
-  return { progress, complete };
+  const heartKey = 'enlang.hearts.v1';
+  const heartMax = 5;
+  const heartInterval = 10 * 60 * 1000;
+  let heartMemory = { count: heartMax, next: null };
+
+  function hearts(now = Date.now()) {
+    let saved = heartMemory;
+    if (storageAvailable) {
+      try {
+        const stored = JSON.parse(localStorage.getItem(heartKey));
+        if (Number.isInteger(stored?.count) && stored.count >= 0 && stored.count < heartMax
+            && Number.isFinite(stored.next) && stored.next > 0) saved = stored;
+        else saved = { count: heartMax, next: null };
+      } catch {}
+    }
+    if (saved.count === heartMax || now < saved.next) return saved;
+    const recovered = 1 + Math.floor((now - saved.next) / heartInterval);
+    const count = Math.min(heartMax, saved.count + recovered);
+    return { count, next: count === heartMax ? null : saved.next + recovered * heartInterval };
+  }
+
+  function spendHeart(now = Date.now()) {
+    const current = hearts(now);
+    if (!current.count) return current;
+    heartMemory = { count: current.count - 1, next: current.next ?? now + heartInterval };
+    if (storageAvailable) {
+      try {
+        localStorage.setItem(heartKey, JSON.stringify(heartMemory));
+      } catch {
+        storageAvailable = false;
+      }
+    }
+    return heartMemory;
+  }
+
+  return { progress, complete, hearts, spendHeart, heartMax };
 })();

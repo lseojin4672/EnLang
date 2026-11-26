@@ -42,7 +42,37 @@ function start({ units, adventure = [] }, layout) {
   const canEnter = (index, progress) => units.slice(0, index)
     .every(unit => unit.lessons.every(lesson => progress.completed.includes(lesson)));
 
+  let updateLessonHearts;
+  const heartButton = find('hearts');
+
+  function refillText(heartState) {
+    if (heartState.next === null) return '하트가 모두 찼어요.';
+    const seconds = Math.max(0, Math.ceil((heartState.next - Date.now()) / 1000));
+    return '다음 하트까지 ' + Math.floor(seconds / 60) + '분 ' + String(seconds % 60).padStart(2, '0') + '초';
+  }
+
+  function refreshHearts() {
+    const heartState = Learning.hearts();
+    const count = heartState.count + ' / ' + Learning.heartMax;
+    const value = find('heart-value');
+    if (value.textContent !== count) {
+      value.textContent = count;
+      heartButton.setAttribute('aria-label', '하트 ' + count);
+    }
+    const timer = dialogBody.querySelector('[data-heart-timer]');
+    if (dialog.open && timer) timer.textContent = refillText(heartState);
+    if (dialog.open) updateLessonHearts?.(heartState);
+  }
+
+  heartButton.addEventListener('click', () => {
+    updateLessonHearts = null;
+    const timer = element('p', '', refillText(Learning.hearts()));
+    timer.dataset.heartTimer = '';
+    openDialog('하트', element('p', '', '오답마다 하트가 하나 줄어요. 10분마다 하나씩, 최대 5개까지 채워져요.'), timer);
+  });
+
   function showLesson(index) {
+    updateLessonHearts = null;
     const { lessons, number } = units[unitIndex];
     const lesson = lessons[index];
     const state = Learning.progress(lessons).status(index);
@@ -53,12 +83,22 @@ function start({ units, adventure = [] }, layout) {
     const prompt = element('p', '', lesson.question);
     const feedback = element('p');
     feedback.setAttribute('role', 'status');
+    const wait = element('p');
     let selected = -1;
     const check = button('정답 확인', 'action', () => {
-      if (selected !== lesson.answer) {
-        feedback.textContent = '다시 한 번 골라 보세요.';
+      if (selected < 0 || !Learning.hearts().count) {
+        refreshHearts();
         return;
       }
+      if (selected !== lesson.answer) {
+        Learning.spendHeart();
+        selected = -1;
+        options.forEach(option => option.setAttribute('aria-pressed', 'false'));
+        feedback.textContent = '하트가 하나 줄었어요. 다시 한 번 골라 보세요.';
+        refreshHearts();
+        return;
+      }
+      updateLessonHearts = null;
       const earned = Learning.complete(lessons, index);
       feedback.textContent = earned ? '정답이에요! 경험치 +' + lesson.xp : '정답이에요!';
       options.forEach(option => { option.disabled = true; });
@@ -74,13 +114,22 @@ function start({ units, adventure = [] }, layout) {
         selected = choiceIndex;
         options.forEach((item, i) => item.setAttribute('aria-pressed', String(i === selected)));
         feedback.textContent = '';
-        check.disabled = false;
+        refreshHearts();
       });
       option.lang = number === 1 ? 'en' : 'ko';
       option.setAttribute('aria-pressed', 'false');
       return option;
     });
-    openDialog(lesson.title, prompt, ...options, check, feedback);
+    updateLessonHearts = heartState => {
+      if (!dialogBody.contains(wait)) return;
+      const empty = heartState.count === 0;
+      check.disabled = empty || selected < 0;
+      options.forEach(option => { option.disabled = empty; });
+      wait.hidden = !empty;
+      if (empty) wait.textContent = '하트를 채우면 다시 풀 수 있어요. ' + refillText(heartState);
+    };
+    openDialog(lesson.title, prompt, ...options, check, feedback, wait);
+    refreshHearts();
   }
 
   let selectedRegion = 0;
@@ -283,7 +332,10 @@ function start({ units, adventure = [] }, layout) {
   find('settings').addEventListener('click', () => openDialog('설정',
     element('p', '', '학습 언어 · 제주어'),
     element('p', '', '학습 기록은 이 브라우저에 저장돼요.')));
-  window.addEventListener('storage', render);
+  window.addEventListener('storage', () => { render(); refreshHearts(); });
+  window.addEventListener('pageshow', refreshHearts);
+  setInterval(refreshHearts, 1000);
+  refreshHearts();
   new ResizeObserver(() => LessonLayout.connect(path)).observe(path);
   renderRoute();
 }
