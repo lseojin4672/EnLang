@@ -3,6 +3,7 @@
   font-family: system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   color: #172d21;
   background: #eaf0e9;
+  --app-width: 520px;
   --green: #21633d;
   --muted: #51665a;
   --line: #dce6dc;
@@ -12,7 +13,7 @@ body { margin: 0; }
 @media (min-width: 560px) { :root { scrollbar-gutter: stable both-edges; } }
 button { font: inherit; cursor: pointer; }
 button:focus-visible, [tabindex]:focus-visible { outline: 3px solid #94640a; outline-offset: 3px; }
-.app { max-inline-size: 520px; min-block-size: 100dvh; margin-inline: auto; background: #fbfcf9; display: flex; flex-direction: column; box-shadow: 0 0 45px #173a2114; }
+.app { max-inline-size: var(--app-width); min-block-size: 100dvh; margin-inline: auto; background: #fbfcf9; display: flex; flex-direction: column; box-shadow: 0 0 45px #173a2114; }
 .top {
   position: sticky; top: 0; z-index: 2; display: grid; grid-template-columns: minmax(44px, 1fr) auto minmax(44px, 1fr);
   align-items: center; gap: clamp(.3rem, 2vw, .75rem); padding: max(.65rem, env(safe-area-inset-top)) clamp(.75rem, 5vw, 1.5rem) .65rem;
@@ -127,6 +128,7 @@ dialog h2 { padding-right: 3rem; margin: .45rem 0 1.2rem; }
 .unit-card-character { display: grid; place-items: center; aspect-ratio: 1; overflow: hidden; align-self: center; border-radius: 1rem; background: #fff5d8; font-size: clamp(2rem, 12vw, 4.75rem); line-height: 1; }
 .unit-card-character img { display: block; width: 100%; height: 100%; object-fit: cover; min-width: 0; min-height: 0; }
 
+@media (max-width: 559px) { :root:has(.lesson-screen[open]) { scrollbar-gutter: stable; } }
 body:has(.lesson-screen[open]) { overflow: hidden; }
 .lesson-screen {
   position: fixed; inset: 0; margin: 0; width: 100%; height: 100dvh; max-width: none;
@@ -134,15 +136,15 @@ body:has(.lesson-screen[open]) { overflow: hidden; }
 }
 .lesson-screen-shell {
   display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
-  max-width: 42rem; height: 100%; margin-inline: auto; background: #fbfcf9;
+  max-inline-size: var(--app-width); height: 100%; margin-inline: auto; background: #fbfcf9;
 }
 .lesson-screen-header {
-  display: flex; align-items: start; justify-content: space-between; gap: .75rem;
+  display: flex; align-items: center; justify-content: space-between; gap: .75rem;
   padding: max(.85rem, env(safe-area-inset-top)) clamp(.8rem, 4vw, 1.5rem) .8rem; border-bottom: 1px solid var(--line);
 }
 .lesson-screen-header span { color: var(--green); font-weight: 750; font-size: .875rem; }
 .lesson-screen-header h2 { margin: .25rem 0 0; padding: 0; font-size: clamp(1.2rem, 4vw, 1.5rem); }
-.lesson-close { inline-size: 44px; block-size: 44px; border: 1px solid var(--line); border-radius: .75rem; background: #fff; color: var(--green); font-size: 1.7rem; }
+.lesson-close { display: grid; place-items: center; padding: 0; inline-size: 44px; block-size: 44px; border: 1px solid var(--line); border-radius: .75rem; background: #fff; color: var(--green); }
 .lesson-screen-scroll { overflow: auto; }
 .lesson-screen-body { display: grid; gap: .8rem; padding: clamp(1rem, 5vw, 2rem); }
 .lesson-screen-body h3 { margin: .45rem 0; font-size: clamp(1.25rem, 5vw, 1.75rem); line-height: 1.4; word-break: keep-all; }
@@ -156,4 +158,6 @@ body:has(.lesson-screen[open]) { overflow: hidden; }
   border-top: 1px solid var(--line); background: #fbfcf9;
 }
 .lesson-screen-actions button { text-align: center; padding: .45rem .2rem; font-size: .875rem; white-space: nowrap; }
+.lesson-icon-action { display: grid; grid-template-rows: 24px 1rem; place-items: center; align-content: center; gap: 2px; }
+.lesson-icon-action span { line-height: 1rem; }
 .lesson-screen-actions button:disabled { opacity: .55; cursor: default; }

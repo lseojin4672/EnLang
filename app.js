@@ -168,6 +168,15 @@ function start({ units, adventure = [] }, layout) {
       if (empty) wait.textContent = '하트를 채우면 다시 풀 수 있어요. ' + refillText(heartState);
     };
     find('lesson-screen-title').textContent = lesson.title;
+    for (const [control, asset] of [[back, 'back.svg'], [forward, 'next.svg'], [hint, 'info.svg']]) {
+      const icon = element('img');
+      icon.src = './assets/' + asset;
+      icon.alt = '';
+      icon.width = icon.height = 24;
+      const label = element('span', '', control.textContent);
+      control.classList.add('lesson-icon-action');
+      control.replaceChildren(icon, label);
+    }
     find('lesson-screen-actions').replaceChildren(back, forward, hint, submit);
     lessonScreen.showModal();
     paint();
@@ -374,7 +383,7 @@ function start({ units, adventure = [] }, layout) {
         const control = button(undefined, 'lesson', () => showLesson(index));
         const disc = element('span', 'disc');
         disc.setAttribute('aria-hidden', 'true');
-        control.append(disc, element('span', 'lesson-label', stepName(index) + ' · ' + lesson.title));
+        control.append(disc, element('span', 'lesson-label', lesson.title));
         row.append(control);
         path.append(row);
       }
