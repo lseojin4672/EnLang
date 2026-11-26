@@ -208,7 +208,7 @@ function start({ units, adventure = [] }, layout) {
       if (open) {
         card.href = unitHref(unit);
         if (index === unitIndex) card.setAttribute('aria-current', 'page');
-        info.append(element('span', 'unit-card-action', count === unit.lessons.length ? '복습하기' : '계속하기'));
+        info.append(element('span', 'unit-card-action', '계속하기'));
       } else {
         info.append(element('small', 'unit-card-requirement', yardName(units[index - 1].number) + '을 완료하면 열려요.'));
         const status = element('span', 'unit-card-action');
