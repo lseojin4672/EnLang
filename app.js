@@ -176,7 +176,7 @@ function start({ unit, adventure = [] }, layout) {
     window.scrollTo(0, 0);
   }));
   find('settings').addEventListener('click', () => openDialog('설정',
-    element('p', '', '학습 언어 · 영어'),
+    element('p', '', '학습 언어 · 제주어'),
     element('p', '', '학습 기록은 이 브라우저에 저장돼요.')));
   window.addEventListener('storage', render);
   new ResizeObserver(() => LessonLayout.connect(path)).observe(path);
