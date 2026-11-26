@@ -60,6 +60,8 @@ function start({ units, adventure = [] }, layout) {
       value.textContent = count;
       heartButton.setAttribute('aria-label', '하트 ' + count);
     }
+    const lessonValue = find('lesson-heart-value');
+    if (lessonScreen.open && lessonValue.textContent !== count) lessonValue.textContent = count;
     const timer = dialogBody.querySelector('[data-heart-timer]');
     if (dialog.open && timer) timer.textContent = refillText(heartState);
     if (dialog.open || lessonScreen.open) updateLessonHearts?.(heartState);
@@ -70,6 +72,12 @@ function start({ units, adventure = [] }, layout) {
     const timer = element('p', '', refillText(Learning.hearts()));
     timer.dataset.heartTimer = '';
     openDialog('하트', element('p', '', '오답마다 하트가 하나 줄어요. 10분마다 하나씩, 최대 5개까지 채워져요.'), timer);
+  });
+
+  lessonScreen.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' || event.isComposing || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    event.preventDefault();
+    if (!event.repeat) find('lesson-submit').click();
   });
 
   function showFullLesson(lessons, index) {
@@ -94,10 +102,14 @@ function start({ units, adventure = [] }, layout) {
         return;
       }
       const answer = answers[current];
-      if (answer.correct || answer.choice < 0 || !Learning.hearts().count) return;
+      if (answer.correct) {
+        if (current < questions.length - 1) move(1);
+        return;
+      }
+      if (answer.choice < 0 || !Learning.hearts().count) return;
       if (answer.choice === questions[current].answer) {
         answer.correct = true;
-        answer.feedback = '정답이에요! 앞으로를 눌러 다음 문제로 가세요.';
+        answer.feedback = '정답이에요! 앞으로나 제출을 누르면 다음 문제로 넘어가요.';
         if (answers.every(item => item.correct)) {
           finished = true;
           const earned = Learning.complete(lessons, index);
@@ -159,7 +171,7 @@ function start({ units, adventure = [] }, layout) {
       back.disabled = finished || current === 0;
       forward.disabled = finished || !answer.correct || current === questions.length - 1;
       hint.disabled = finished;
-      submit.disabled = !finished && (empty || answer.correct || answer.choice < 0);
+      submit.disabled = !finished && (answer.correct ? forward.disabled : empty || answer.choice < 0);
       options.forEach((option, i) => {
         option.disabled = empty || answer.correct;
         option.setAttribute('aria-pressed', String(i === answer.choice));
@@ -177,6 +189,7 @@ function start({ units, adventure = [] }, layout) {
       control.classList.add('lesson-icon-action');
       control.replaceChildren(icon, label);
     }
+    submit.id = 'lesson-submit';
     find('lesson-screen-actions').replaceChildren(back, forward, hint, submit);
     lessonScreen.showModal();
     paint();
