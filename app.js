@@ -141,17 +141,40 @@ function start({ units, adventure = [] }, layout) {
       const open = canEnter(index, progress);
       const card = element(open ? 'a' : 'div', open ? 'unit-card' : 'unit-card unit-card-locked');
       const count = unit.lessons.filter(lesson => progress.completed.includes(lesson)).length;
-      card.append(element('strong', '', '유닛 ' + unit.number + ' · ' + unit.title));
+      const info = element('div', 'unit-card-info');
+      const meter = element('progress');
+      meter.max = unit.lessons.length;
+      meter.value = count;
+      meter.setAttribute('aria-label', '유닛 ' + unit.number + ' 진행도');
+      info.append(
+        element('span', 'unit-card-number', '유닛 ' + unit.number),
+        element('h2', 'unit-card-title', unit.title),
+        meter,
+        element('small', 'unit-card-count', count + ' / ' + unit.lessons.length + ' 완료')
+      );
       if (open) {
         card.href = unitHref(unit);
         if (index === unitIndex) card.setAttribute('aria-current', 'page');
-        card.append(element('small', '', count + ' / ' + unit.lessons.length + ' 완료'));
+        info.append(element('span', 'unit-card-action', count === unit.lessons.length ? '복습하기' : '계속하기'));
       } else {
-        card.append(element('small', '', '유닛 ' + units[index - 1].number + '을 완료하면 열려요.'));
+        info.append(element('small', 'unit-card-requirement', '유닛 ' + units[index - 1].number + '을 완료하면 열려요.'));
+        const status = element('span', 'unit-card-action');
         const lock = element('span', 'lock');
         lock.setAttribute('aria-hidden', 'true');
-        card.append(lock);
+        status.append(lock, '잠김');
+        info.append(status);
       }
+      const character = element('div', 'unit-card-character');
+      character.setAttribute('aria-hidden', 'true');
+      if (unit.character) {
+        const image = element('img');
+        image.src = unit.character;
+        image.alt = '';
+        character.append(image);
+      } else {
+        character.textContent = '🐤';
+      }
+      card.append(info, character);
       row.append(card);
       return row;
     }));

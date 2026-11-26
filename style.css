@@ -102,12 +102,19 @@ dialog h2 { padding-right: 3rem; margin: .45rem 0 1.2rem; }
 .adventure-detail .action { margin-top: .35rem; }
 
 .unit-title-link { display: block; text-decoration: none; }
-.unit-title-link h1, .unit-card strong { white-space: pre-line; word-break: keep-all; text-wrap: balance; }
+.unit-title-link h1, .unit-card-title { white-space: pre-line; word-break: keep-all; text-wrap: balance; }
 .unit-title-link:focus-visible, .unit-link:focus-visible, .unit-card:focus-visible { outline: 3px solid #94640a; outline-offset: 3px; }
 .unit-link { display: inline-flex; align-items: center; justify-content: center; justify-self: stretch; text-align: center; text-decoration: none; margin-top: .4rem; }
 .unit-list { display: grid; gap: .75rem; list-style: none; padding: 0; margin: 1rem 0; }
-.unit-card { display: grid; gap: .25rem; min-height: 44px; padding: .85rem 1rem; border: 1px solid var(--line); border-radius: .9rem; background: #fff; color: var(--green); text-decoration: none; }
-.unit-card[aria-current="page"] { background: #e2f0df; border-color: #87b696; }
-.unit-card-locked { grid-template-columns: 1fr auto; align-items: center; background: #f0f2ed; color: var(--muted); }
-.unit-card-locked small { grid-column: 1; }
-.unit-card-locked .lock { grid-column: 2; grid-row: 1 / span 2; }
+.unit-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(4.25rem, 32%); gap: clamp(.6rem, 3vw, 1.2rem); padding: clamp(.85rem, 4vw, 1.2rem); border: 1px solid var(--line); border-radius: 1.1rem; background: #fff; color: var(--green); text-decoration: none; }
+.unit-card[aria-current="page"] { background: #f0f7ec; border-color: #87b696; }
+.unit-card-info { display: grid; align-content: start; gap: .35rem; min-width: 0; }
+.unit-card-number { font-size: .875rem; font-weight: 750; }
+.unit-card-title { margin: 0 0 .2rem; color: #172d21; font-size: clamp(1.05rem, 4.5vw, 1.45rem); line-height: 1.2; }
+.unit-card progress { margin-top: 0; }
+.unit-card-count, .unit-card-requirement { color: var(--muted); font-size: .875rem; }
+.unit-card-action { display: flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; margin-top: .35rem; border-radius: .75rem; background: var(--green); color: #fff; font-size: .875rem; font-weight: 750; }
+.unit-card-locked { background: #f0f2ed; color: var(--muted); }
+.unit-card-locked .unit-card-action { background: #e4e9e1; color: var(--muted); }
+.unit-card-character { display: grid; place-items: center; aspect-ratio: 1; align-self: center; border-radius: 1rem; background: #fff5d8; font-size: clamp(2rem, 12vw, 4.75rem); line-height: 1; }
+.unit-card-character img { display: block; width: 100%; height: 100%; object-fit: contain; }
