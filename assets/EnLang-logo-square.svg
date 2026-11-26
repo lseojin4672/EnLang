@@ -1,7 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 352" width="352" height="352" role="img" aria-labelledby="title">
 <title id="title">EnLang</title>
-<defs><linearGradient id="forest" x2="1" y2="1"><stop stop-color="#335743"/><stop offset="1" stop-color="#263D30"/></linearGradient></defs>
-<path fill="url(#forest)" d="M76,0L276,0C318,0 352,34 352,76L352,276C352,318 318,352 276,352L76,352C34,352 0,318 0,276L0,76C0,34 34,0 76,0Z"/>
-<path fill="#86BD65" d="M82,105L174,105L174,132L112,132L112,161L161,161L161,187L112,187L112,220L174,220L174,247L82,247Z"/>
-<path fill="#F5F8F2" d="M197,105L228,105L228,220L270,220L270,247L197,247Z"/>
+<path fill="#FFFFFF" d="M76,0L276,0C318,0 352,34 352,76L352,276C352,318 318,352 276,352L76,352C34,352 0,318 0,276L0,76C0,34 34,0 76,0Z"/>
+<path fill="#39844C" d="M82,105L174,105L174,132L112,132L112,161L161,161L161,187L112,187L112,220L174,220L174,247L82,247Z"/>
+<path fill="#357DA7" d="M197,105L228,105L228,220L270,220L270,247L197,247Z"/>
 </svg>
