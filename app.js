@@ -109,10 +109,10 @@ function start({ unit, adventure = [] }, layout) {
     });
     const region = adventure[selectedRegion];
     const locked = region.unit > currentUnit;
-    find('region-title').textContent = locked ? '유닛 ' + region.unit : region.landmark;
+    find('region-title').textContent = locked ? '유닛 ' + region.unit : region.places.join(', ');
     find('region-description').textContent = locked
       ? '유닛 ' + region.unit + '에 도달하면 열려요.'
-      : region.description;
+      : region.landmark + ' · ' + region.description;
     find('region-learn').hidden = !locked;
   }
 
