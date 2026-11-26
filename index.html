@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8faf6">
 <title>EnLang · 제주어 학습</title>
-<link rel="stylesheet" href="./style.css?v=lesson-label-wrap">
+<link rel="stylesheet" href="./style.css?v=jeju-map-touch">
 <script defer src="./learning.js"></script>
 <script defer src="./layout.js"></script>
-<script defer src="./app.js?v=header-icons"></script>
+<script defer src="./app.js?v=jeju-map-touch"></script>
 </head>
 <body>
 <div class="app">
@@ -25,7 +25,7 @@
       <p class="adventure-intro">새 유닛에 도달할 때마다 지도에서 새 구역이 열려요.</p>
       <p id="adventure-progress" role="status"></p>
       <div id="adventure-map" class="adventure-map" role="group" aria-label="제주 지역 지도">
-        <svg xmlns="http://www.w3.org/2000/svg" width="840" height="500" viewBox="0 0 840 500" aria-hidden="true" focusable="false">
+        <svg xmlns="http://www.w3.org/2000/svg" width="840" height="500" viewBox="0 0 840 500">
 
 
 
@@ -125,6 +125,41 @@
           </g>
         </g>
 
+        <g clip-path="url(#land)" stroke="#405E50" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <!-- Market stall and a signpost in the north -->
+          <g transform="translate(525 112)">
+            <path d="M-21 17v-27h42v27z" fill="#F9E7BB"/>
+            <path d="M-25-9l6-11h38l6 11z" fill="#F4A340"/>
+            <path d="M-8-9v-11m16 11v-11M-24 17h48" fill="none"/>
+            <circle cx="-9" cy="4" r="4" fill="#F4A340"/>
+            <circle cx="3" cy="4" r="4" fill="#F4A340"/>
+          </g>
+          <g transform="translate(292 165)">
+            <path d="M0-18v35" fill="none"/>
+            <path d="M-15-13h25l7 5-7 5h-25z" fill="#F9E7BB"/>
+            <path d="M14 1h-24l-7 5 7 5h24z" fill="#F4A340"/>
+          </g>
+          <!-- Tea cup in the west -->
+          <g transform="translate(160 322)">
+            <path d="M-12-4h24v7a12 12 0 0 1-24 0z" fill="#F9E7BB"/>
+            <path d="M12-3h5a5 5 0 0 1 0 10h-5M-18 17h36M-5-10q-4-4 0-8m9 8q-4-4 0-8" fill="none"/>
+          </g>
+          <!-- Camera in the south -->
+          <g transform="translate(568 325)">
+            <path d="M-20-8h11l4-6h10l4 6h11v23h-40z" fill="#F9E7BB"/>
+            <circle r="7" cy="3" fill="#88D3F0"/>
+          </g>
+          <!-- Ferry in the east -->
+          <g transform="translate(704 216)">
+            <path d="M-21 4h42l-8 12h-26z" fill="#88D3F0"/>
+            <path d="M-12 4v-10h22V4M-4-6v-8h8v8" fill="#F5F8F2"/>
+            <path d="M-19 22q5-3 10 0t10 0t10 0t10 0" fill="none"/>
+          </g>
+          <!-- Trail marker in the center -->
+          <g transform="translate(449 226)">
+            <path d="M0-12v24m-10-20h17l6 4-6 4h-17z" fill="#F9E7BB"/>
+          </g>
+        </g>
         <g clip-path="url(#land)" fill="#DCE2DC" stroke="#FAFFF3" stroke-width="3" stroke-linejoin="round">
           <path data-zone-mask="1" style="display:none" d="M75,-8L710,-8L625,125L473,188L342,215L183,142Z"/>
           <path data-zone-mask="2" d="M75,-8L183,142L342,215L350,314L203,365L90,500L0,500L0,-8Z"/>
@@ -132,6 +167,7 @@
           <path data-zone-mask="4" d="M710,-8L840,-8L840,500L815,500L655,318L492,285L473,188L625,125Z"/>
           <path data-zone-mask="5" d="M342 215 473 188 492 285 350 314Z"/>
         </g>
+          <g class="zone-targets" clip-path="url(#land)"></g>
         </svg>
       </div>
       <div class="adventure-detail" aria-live="polite">

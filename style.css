@@ -92,13 +92,9 @@ dialog h2 { padding-right: 3rem; margin: .45rem 0 1.2rem; }
 #adventure-progress { margin: 0 0 .6rem; color: var(--green); font-weight: 750; }
 .adventure-map { position: relative; aspect-ratio: 840 / 500; background: #e2f1f3; border: 1px solid #c9e0e4; border-radius: 1.2rem; }
 .adventure-map > svg { display: block; width: 100%; height: auto; }
-.region-pin {
-  position: absolute; transform: translate(-50%, -50%); min-height: 44px; min-width: 44px;
-  padding: .25rem .4rem; border: 1px solid #8bab93; border-radius: .75rem;
-  background: #23683f; color: #fff; font-size: .875rem; font-weight: 750; width: max-content; max-width: 38%; word-break: keep-all;
-}
-.region-pin[data-locked="true"] { background: #f7f9f5; color: #526556; border-style: dashed; }
-.region-pin[aria-pressed="true"] { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #23683f; z-index: 1; }
+.zone-target { fill: transparent; cursor: pointer; }
+.zone-target:focus-visible { outline: none; stroke: #215737; stroke-width: 5; stroke-dasharray: 7 4; }
+.region-lock { position: absolute; transform: translate(-50%, -50%); margin: 0; color: #53645a; pointer-events: none; }
 .adventure-detail { margin-top: .85rem; border: 1px solid var(--line); border-radius: 1rem; background: #f1f7ec; padding: .9rem 1rem; }
 .adventure-detail h2 { font-size: 1.15rem; margin: 0; }
 .adventure-detail p { margin: .4rem 0; line-height: 1.5; }

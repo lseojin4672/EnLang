@@ -77,42 +77,51 @@ function start({ unit, adventure = [] }, layout) {
 
   let selectedRegion = 0;
   const adventureMap = find('adventure-map');
-  const regionPins = adventureMap ? adventure.map((region, index) => {
-    const pin = button(undefined, 'region-pin', () => {
+  const targets = adventureMap?.querySelector('.zone-targets');
+  const regions = targets ? adventure.map((region, index) => {
+    const shape = adventureMap.querySelector('#unit-' + region.unit);
+    const target = document.createElementNS(targets.namespaceURI, 'path');
+    target.setAttribute('d', shape.getAttribute('d'));
+    target.setAttribute('class', 'zone-target');
+    target.setAttribute('role', 'button');
+    target.setAttribute('tabindex', '0');
+    target.addEventListener('click', () => {
       selectedRegion = index;
       renderAdventure();
     });
-    const lock = element('span', 'lock');
+    target.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      target.dispatchEvent(new Event('click'));
+    });
+    targets.append(target);
+    const lock = element('span', 'lock region-lock');
     lock.setAttribute('aria-hidden', 'true');
-    pin.append(lock, element('span', 'region-name', region.places.join(', ')));
-    pin.style.left = region.x + '%';
-    pin.style.top = region.y + '%';
-    adventureMap.append(pin);
-    return pin;
+    lock.style.left = region.x + '%';
+    lock.style.top = region.y + '%';
+    adventureMap.append(lock);
+    return { target, lock, mask: adventureMap.querySelector('[data-zone-mask="' + region.unit + '"]') };
   }) : [];
 
   function renderAdventure() {
-    if (!regionPins.length) return;
+    if (!regions.length) return;
     const currentUnit = unit.number;
     const openCount = adventure.filter(region => region.unit <= currentUnit).length;
     find('adventure-progress').textContent = openCount + ' / ' + adventure.length + ' 구역 해금';
-    regionPins.forEach((pin, index) => {
+    regions.forEach(({ target, lock, mask }, index) => {
       const region = adventure[index];
       const locked = region.unit > currentUnit;
-      pin.dataset.locked = String(locked);
-      pin.setAttribute('aria-label', locked ? '유닛 ' + region.unit + ', 잠김' : region.places.join(', ') + ', 탐험 가능');
-      pin.setAttribute('aria-pressed', String(index === selectedRegion));
-      pin.firstElementChild.hidden = !locked;
-      pin.lastElementChild.hidden = locked;
-      const mask = adventureMap.querySelector('[data-zone-mask="' + region.unit + '"]');
-      if (mask) mask.style.display = locked ? '' : 'none';
+      target.setAttribute('aria-label', locked ? '유닛 ' + region.unit + ', 잠김' : region.places.join(', ') + ', 탐험 가능');
+      target.setAttribute('aria-pressed', String(index === selectedRegion));
+      lock.hidden = !locked;
+      mask.style.display = locked ? '' : 'none';
     });
     const region = adventure[selectedRegion];
     const locked = region.unit > currentUnit;
     find('region-title').textContent = locked ? '유닛 ' + region.unit : region.places.join(', ');
     find('region-description').textContent = locked
       ? '유닛 ' + region.unit + '에 도달하면 열려요.'
-      : region.landmark + ' · ' + region.description;
+      : region.description;
     find('region-learn').hidden = !locked;
   }
 
@@ -186,7 +195,7 @@ function start({ unit, adventure = [] }, layout) {
 async function getData(name) {
   const embedded = find(name + '-data');
   if (embedded) return JSON.parse(embedded.textContent);
-  const response = await fetch('./' + name + '.json' + (name === 'content' ? '?v=jeju-places' : ''));
+  const response = await fetch('./' + name + '.json' + (name === 'content' ? '?v=jeju-map-touch' : ''));
   if (!response.ok) throw new Error(name);
   return response.json();
 }
