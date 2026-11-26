@@ -1,9 +1,9 @@
 {
   "unit": {
     "number": 1,
-    "title": "첫인사 나누기",
-    "description": "처음 만난 사람과 인사하고 나를 소개해요.",
-    "nextTitle": "일상 표현 익히기",
+    "title": "생존 제주어",
+    "description": "제주어 사용에 필요한 필수 표현",
+    "nextTitle": "나와 가족",
     "lessons": [
       {"id":"lesson-1-1","title":"인사하기","xp":10,"question":"‘안녕하세요’에 해당하는 표현은?","options":["Hello!","Goodbye!","Thank you!"],"answer":0},
       {"id":"lesson-1-2","title":"이름 말하기","xp":10,"question":"‘제 이름은 미나예요’에 해당하는 표현은?","options":["How are you?","My name is Mina.","See you soon!"],"answer":1},
