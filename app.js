@@ -84,7 +84,7 @@ function start({ unit, adventure = [] }, layout) {
     });
     const lock = element('span', 'lock');
     lock.setAttribute('aria-hidden', 'true');
-    pin.append(lock, element('span', 'region-name', region.name));
+    pin.append(lock, element('span', 'region-name', region.places.join(', ')));
     pin.style.left = region.x + '%';
     pin.style.top = region.y + '%';
     adventureMap.append(pin);
@@ -100,7 +100,7 @@ function start({ unit, adventure = [] }, layout) {
       const region = adventure[index];
       const locked = region.unit > currentUnit;
       pin.dataset.locked = String(locked);
-      pin.setAttribute('aria-label', region.name + (locked ? ', 잠김' : ', 탐험 가능'));
+      pin.setAttribute('aria-label', locked ? '유닛 ' + region.unit + ', 잠김' : region.places.join(', ') + ', 탐험 가능');
       pin.setAttribute('aria-pressed', String(index === selectedRegion));
       pin.firstElementChild.hidden = !locked;
       pin.lastElementChild.hidden = locked;
@@ -109,10 +109,10 @@ function start({ unit, adventure = [] }, layout) {
     });
     const region = adventure[selectedRegion];
     const locked = region.unit > currentUnit;
-    find('region-title').textContent = region.name;
+    find('region-title').textContent = locked ? '유닛 ' + region.unit : region.landmark;
     find('region-description').textContent = locked
       ? '유닛 ' + region.unit + '에 도달하면 열려요.'
-      : region.places.join(' · ');
+      : region.description;
     find('region-learn').hidden = !locked;
   }
 
@@ -186,7 +186,7 @@ function start({ unit, adventure = [] }, layout) {
 async function getData(name) {
   const embedded = find(name + '-data');
   if (embedded) return JSON.parse(embedded.textContent);
-  const response = await fetch('./' + name + '.json' + (name === 'content' ? '?v=jeju-zones' : ''));
+  const response = await fetch('./' + name + '.json' + (name === 'content' ? '?v=jeju-places' : ''));
   if (!response.ok) throw new Error(name);
   return response.json();
 }
