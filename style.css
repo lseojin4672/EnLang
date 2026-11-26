@@ -165,3 +165,12 @@ body:has(.lesson-screen[open]) { overflow: hidden; }
 .lesson-icon-action { display: grid; grid-template-rows: 24px 1rem; place-items: center; align-content: center; gap: 2px; }
 .lesson-icon-action span { line-height: 1rem; }
 .lesson-screen-actions button:disabled { opacity: .55; cursor: default; }
+
+.question-response, .match-column { display: grid; gap: .5rem; min-width: 0; }
+.question-context { padding: .75rem; border-radius: .75rem; background: #e8f1e7; }
+.question-instruction { color: var(--muted); }
+.match-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.match-grid .option { height: 100%; overflow-wrap: anywhere; }
+.word-tray { display: flex; flex-wrap: wrap; gap: .5rem; }
+.word-tray .option { width: auto; }
+.question-response .option:disabled { opacity: .68; }

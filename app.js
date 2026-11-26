@@ -80,10 +80,98 @@ function start({ units, adventure = [] }, layout) {
     if (!event.repeat) find('lesson-submit').click();
   });
 
+  function buildQuestionResponse(question, attempt, refresh) {
+    const group = element('div', 'question-response');
+    if (question.cloze) group.append(element('p', 'question-context', question.cloze));
+    if (question.speaker) group.append(element('p', 'question-context', question.speaker + ' · “' + question.line + '”'));
+
+    if (question.type === 'match') {
+      const grid = element('div', 'match-grid');
+      const leftColumn = element('div', 'match-column');
+      const rightColumn = element('div', 'match-column');
+      const labels = element('p', 'question-instruction');
+      labels.setAttribute('role', 'status');
+      const left = question.left.map((word, index) => button(word, 'option', () => {
+        attempt.matchLeft = index;
+        refresh();
+      }));
+      const right = question.right.map((word, index) => button(word, 'option', () => {
+        const previous = attempt.choice.indexOf(index);
+        if (previous >= 0) attempt.choice[previous] = -1;
+        attempt.choice[attempt.matchLeft] = index;
+        attempt.matchLeft = -1;
+        refresh();
+      }));
+      leftColumn.append(...left);
+      rightColumn.append(...right);
+      grid.append(leftColumn, rightColumn);
+      group.append(labels, grid);
+      return { group, update(disabled) {
+        const instruction = attempt.matchLeft >= 0
+          ? '“' + question.left[attempt.matchLeft] + '”의 뜻을 골라 보세요.'
+          : '왼쪽 낱말을 누르고 오른쪽에서 뜻을 고르세요.';
+        if (labels.textContent !== instruction) labels.textContent = instruction;
+        left.forEach((control, i) => {
+          const pair = attempt.choice[i];
+          control.disabled = disabled;
+          control.setAttribute('aria-pressed', String(i === attempt.matchLeft));
+          control.textContent = (i + 1) + '. ' + question.left[i];
+          control.setAttribute('aria-label', question.left[i] + (pair < 0 ? '' : ' · ' + question.right[pair]));
+        });
+        right.forEach((control, i) => {
+          const pair = attempt.choice.indexOf(i);
+          control.disabled = disabled || attempt.matchLeft < 0;
+          control.textContent = question.right[i] + (pair < 0 ? '' : ' · ' + (pair + 1));
+        });
+      }};
+    }
+
+    if (question.type === 'order') {
+      const sentence = element('p', 'question-context');
+      sentence.setAttribute('role', 'status');
+      const tray = element('div', 'word-tray');
+      const words = question.options.map((word, index) => button(word, 'option', () => {
+        attempt.choice.push(index);
+        refresh();
+      }));
+      const undo = button('마지막 조각 빼기', 'option', () => {
+        attempt.choice.pop();
+        refresh();
+      });
+      tray.append(...words);
+      group.append(sentence, tray, undo);
+      return { group, update(disabled) {
+        const text = attempt.choice.map(i => question.options[i]).join(' ') || '고른 말 조각이 여기에 나와요.';
+        if (sentence.textContent !== text) sentence.textContent = text;
+        words.forEach((control, i) => { control.disabled = disabled || attempt.choice.includes(i); });
+        undo.disabled = disabled || !attempt.choice.length;
+      }};
+    }
+
+    const choices = question.options.map((choice, index) => button(choice, 'option', () => {
+      attempt.choice = index;
+      refresh();
+    }));
+    group.append(...choices);
+    return { group, update(disabled) {
+      choices.forEach((choice, index) => {
+        choice.disabled = disabled;
+        choice.setAttribute('aria-pressed', String(index === attempt.choice));
+      });
+    }};
+  }
+
   function showFullLesson(lessons, index) {
     const lesson = lessons[index];
     const questions = lesson.questions;
-    const makeAttempt = questionIndex => ({ questionIndex, choice: -1, correct: null, hint: false });
+    const makeAttempt = questionIndex => {
+      const question = questions[questionIndex];
+      const choice = question.type === 'match' ? question.left.map(() => -1) : question.type === 'order' ? [] : -1;
+      return { questionIndex, choice, matchLeft: -1, correct: null, hint: false };
+    };
+    const ready = attempt => Array.isArray(attempt.choice)
+      ? attempt.choice.length === questions[attempt.questionIndex].answer.length && attempt.choice.every(choice => choice >= 0)
+      : attempt.choice >= 0;
     const attempts = questions.map((question, questionIndex) => makeAttempt(questionIndex));
     const startedAt = Date.now();
     const timer = find('lesson-elapsed');
@@ -96,7 +184,7 @@ function start({ units, adventure = [] }, layout) {
     const wait = element('p', 'lesson-screen-wait');
     let current = 0;
     let finished = false;
-    let options = [];
+    let response;
     const back = button('뒤로', 'option', () => move(-1));
     const forward = button('앞으로', 'option', () => move(1));
     const hint = button('힌트', 'option', () => {
@@ -113,8 +201,11 @@ function start({ units, adventure = [] }, layout) {
         if (current < attempts.length - 1) move(1);
         return;
       }
-      if (answer.choice < 0 || !Learning.hearts().count) return;
-      answer.correct = answer.choice === questions[answer.questionIndex].answer;
+      if (!ready(answer) || !Learning.hearts().count) return;
+      const expected = questions[answer.questionIndex].answer;
+      answer.correct = Array.isArray(expected)
+        ? expected.every((choice, index) => choice === answer.choice[index])
+        : answer.choice === expected;
       if (!answer.correct) {
         Learning.spendHeart();
         attempts.push(makeAttempt(answer.questionIndex));
@@ -156,11 +247,7 @@ function start({ units, adventure = [] }, layout) {
         : (answer.questionIndex + 1) + '번 (재시도)';
       const heading = element('h3', '', question.question);
       heading.tabIndex = -1;
-      options = question.options.map((choice, choiceIndex) =>
-        button(choice, 'option', () => {
-          answer.choice = choiceIndex;
-          refreshHearts();
-        }));
+      response = buildQuestionResponse(question, answer, refreshHearts);
       const hintText = element('p', 'lesson-screen-hint', question.hint);
       hintText.id = 'lesson-hint-text';
       hintText.hidden = !answer.hint;
@@ -170,7 +257,7 @@ function start({ units, adventure = [] }, layout) {
         ? '정답이에요! 앞으로나 제출을 누르면 다음 문제로 넘어가요.'
         : '하트가 하나 줄었어요. 이 문제는 뒤에서 다시 풀어요.');
       feedback.setAttribute('role', 'status');
-      body.replaceChildren(heading, ...options, hintText, feedback, wait);
+      body.replaceChildren(heading, response.group, hintText, feedback, wait);
       refreshHearts();
     }
 
@@ -186,11 +273,8 @@ function start({ units, adventure = [] }, layout) {
       back.disabled = finished || current === 0;
       forward.disabled = finished || !graded || current === attempts.length - 1;
       hint.disabled = finished;
-      submit.disabled = !finished && (graded ? forward.disabled : empty || answer.choice < 0);
-      options.forEach((option, i) => {
-        option.disabled = empty || graded;
-        option.setAttribute('aria-pressed', String(i === answer.choice));
-      });
+      submit.disabled = !finished && (graded ? forward.disabled : empty || !ready(answer));
+      response.update(empty || graded);
       wait.hidden = finished || !empty;
       if (empty) wait.textContent = '하트를 채우면 다시 풀 수 있어요. ' + refillText(heartState);
     };
@@ -487,7 +571,7 @@ function start({ units, adventure = [] }, layout) {
 async function getData(name) {
   const embedded = find(name + '-data');
   if (embedded) return JSON.parse(embedded.textContent);
-  const response = await fetch('./' + name + '.json?v=full-lesson');
+  const response = await fetch('./' + name + '.json?v=question-types');
   if (!response.ok) throw new Error(name);
   return response.json();
 }
