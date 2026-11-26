@@ -155,7 +155,6 @@ function start({ units, adventure = [] }, layout) {
       row.append(card);
       return row;
     }));
-    find('return-unit').href = unitHref(units[unitIndex]);
     find('unit-route-message').hidden = !routeMessage;
     find('unit-route-message').textContent = routeMessage;
   }
@@ -264,7 +263,7 @@ function start({ units, adventure = [] }, layout) {
 async function getData(name) {
   const embedded = find(name + '-data');
   if (embedded) return JSON.parse(embedded.textContent);
-  const response = await fetch('./' + name + '.json?v=units-v1');
+  const response = await fetch('./' + name + '.json?v=unit-review');
   if (!response.ok) throw new Error(name);
   return response.json();
 }

@@ -100,7 +100,8 @@ dialog h2 { padding-right: 3rem; margin: .45rem 0 1.2rem; }
 .adventure-detail p { margin: .4rem 0; line-height: 1.5; }
 .adventure-detail .action { margin-top: .35rem; }
 
-.unit-title-link { display: inline-block; color: inherit; text-decoration: underline; text-underline-offset: .16em; }
+.unit-title-link { display: block; text-decoration: none; }
+.unit-title-link h1, .unit-card strong { white-space: pre-line; word-break: keep-all; text-wrap: balance; }
 .unit-title-link:focus-visible, .unit-link:focus-visible, .unit-card:focus-visible { outline: 3px solid #94640a; outline-offset: 3px; }
 .unit-link { display: inline-flex; align-items: center; justify-self: start; text-decoration: none; margin-top: .4rem; }
 .unit-list { display: grid; gap: .75rem; list-style: none; padding: 0; margin: 1rem 0; }
