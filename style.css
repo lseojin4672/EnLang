@@ -56,8 +56,12 @@ progress::-moz-progress-bar { background: #3d8654; border-radius: 1rem; }
 .next div { display: grid; gap: .2rem; }
 .next span, .next small { font-size: .875rem; }
 nav { position: sticky; bottom: 0; z-index: 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; padding: .5rem 1rem max(.5rem, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: #fbfcf9; }
-nav button { display: grid; justify-items: center; align-content: center; gap: .35rem; min-height: 56px; border: 0; border-radius: .85rem; background: transparent; color: var(--muted); font-size: .875rem; font-weight: 750; }
+nav button { display: grid; grid-template-rows: 24px 1rem; place-items: center; align-content: center; gap: 2px; min-height: 56px; border: 0; border-radius: .85rem; background: transparent; color: var(--muted); font-size: .875rem; font-weight: 750; }
 nav button[aria-current] { background: #e2f0df; color: #225e37; }
+nav button img { display: block; }
+nav button span { line-height: 1rem; white-space: nowrap; }
+nav button[data-page="learn"] img { transform: translateY(1px) scale(1.1); }
+nav button[data-page="review"] img { transform: translateY(-.5px) scale(1.35); }
 .nav-icon { height: 16px; width: 21px; position: relative; }
 .map, .book { border: 2px solid currentColor; border-radius: 3px; }
 .map { transform: skewY(-9deg); }
